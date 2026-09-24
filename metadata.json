@@ -1,0 +1,6 @@
+{
+  "name": "Sarathi - AI Travel Cognition Engine",
+  "description": "Natural language travel recommendations that understand your intent, mood, and travel pacing.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
