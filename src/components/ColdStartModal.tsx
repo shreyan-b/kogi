@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { UserPreferences } from '../types';
+import { useLanguage } from '../context/LanguageContext';
+import { LOCALIZED_COLD_START } from '../i18n/localizedData';
 
 interface ColdStartModalProps {
   isOpen: boolean;
@@ -12,6 +14,7 @@ export const ColdStartModal: React.FC<ColdStartModalProps> = ({
   onClose,
   onSavePreferences,
 }) => {
+  const { t, language } = useLanguage();
   const [step, setStep] = useState(1);
   const [pace, setPace] = useState<UserPreferences['pace']>('slow');
   const [atmosphere, setAtmosphere] = useState<UserPreferences['atmosphere']>('mist-mountain');
@@ -19,6 +22,8 @@ export const ColdStartModal: React.FC<ColdStartModalProps> = ({
   const [transitMode, setTransitMode] = useState<UserPreferences['transitMode']>('private-chauffeur');
 
   if (!isOpen) return null;
+
+  const content = LOCALIZED_COLD_START[language] || LOCALIZED_COLD_START['en-IN'];
 
   const handleFinish = () => {
     onSavePreferences({
@@ -46,7 +51,7 @@ export const ColdStartModal: React.FC<ColdStartModalProps> = ({
         <div className="flex items-center gap-2 mb-2">
           <span className="material-symbols-outlined text-[#4648d4] text-[20px]">tune</span>
           <span className="text-xs font-bold text-[#4648d4] uppercase tracking-wider">
-            Cold-Start Calibration • Step {step} of 3
+            {t.coldStartStepOf || 'Cold-Start Calibration • Step'} {step} / 3
           </span>
         </div>
 
@@ -59,32 +64,15 @@ export const ColdStartModal: React.FC<ColdStartModalProps> = ({
 
         {step === 1 && (
           <div>
-            <h3 className="text-xl font-bold text-[#1b1b1e] mb-1">What is your ideal daily travel pacing?</h3>
+            <h3 className="text-xl font-bold text-[#1b1b1e] mb-1">
+              {content.step1.question}
+            </h3>
             <p className="text-xs text-[#6e7a75] mb-5">
-              Sarathi adjusts itinerary density so you never feel exhausted or rushed.
+              {content.step1.sub}
             </p>
 
             <div className="space-y-3">
-              {[
-                {
-                  id: 'slow',
-                  title: 'Slow Sensory Cadence',
-                  desc: '1–2 leisurely spots per day. Ample balcony reading, lingering breakfasts, zero schedule stress.',
-                  badge: 'Recommended for deep restoration',
-                },
-                {
-                  id: 'balanced',
-                  title: 'Curated Rhythm',
-                  desc: '2–3 focal experiences with dedicated afternoon rest and relaxed evening strolls.',
-                  badge: 'Harmonious balance',
-                },
-                {
-                  id: 'fast',
-                  title: 'High-Density Exploration',
-                  desc: 'Early morning to twilight immersion covering multiple landmarks, treks, and hidden alleys.',
-                  badge: 'Maximum geographic breadth',
-                },
-              ].map((item) => (
+              {content.step1.options.map((item) => (
                 <div
                   key={item.id}
                   onClick={() => setPace(item.id as UserPreferences['pace'])}
@@ -109,18 +97,15 @@ export const ColdStartModal: React.FC<ColdStartModalProps> = ({
 
         {step === 2 && (
           <div>
-            <h3 className="text-xl font-bold text-[#1b1b1e] mb-1">Which climatic micro-zone calls to you?</h3>
+            <h3 className="text-xl font-bold text-[#1b1b1e] mb-1">
+              {content.step2.question}
+            </h3>
             <p className="text-xs text-[#6e7a75] mb-5">
-              Vector cognition maps temperature, humidity, cloud cover, and elevation.
+              {content.step2.sub}
             </p>
 
             <div className="grid grid-cols-2 gap-3">
-              {[
-                { id: 'mist-mountain', name: 'High Mist & Mountain Fog', icon: 'cloud', temp: '16–21°C' },
-                { id: 'backwaters', name: 'Canal Waters & Lotus Estuaries', icon: 'water', temp: '26–29°C' },
-                { id: 'dense-forest', name: 'Deep Evergreen Forest & Plantations', icon: 'forest', temp: '19–24°C' },
-                { id: 'heritage', name: 'Ancient Monoliths & Golden Light', icon: 'temple_hindu', temp: '24–30°C' },
-              ].map((item) => (
+              {content.step2.options.map((item) => (
                 <div
                   key={item.id}
                   onClick={() => setAtmosphere(item.id as UserPreferences['atmosphere'])}
@@ -145,22 +130,20 @@ export const ColdStartModal: React.FC<ColdStartModalProps> = ({
 
         {step === 3 && (
           <div>
-            <h3 className="text-xl font-bold text-[#1b1b1e] mb-1">Budget tier & transit comfort</h3>
+            <h3 className="text-xl font-bold text-[#1b1b1e] mb-1">
+              {content.step3.question}
+            </h3>
             <p className="text-xs text-[#6e7a75] mb-5">
-              Transparent cost modeling per person including stays, meals, and private transfers.
+              {content.step3.sub}
             </p>
 
             <div className="space-y-4">
               <div>
                 <label className="text-xs font-bold text-[#1b1b1e] uppercase tracking-wider block mb-2">
-                  Budget Cadence
+                  {content.step3.budgetLabel}
                 </label>
                 <div className="grid grid-cols-3 gap-2">
-                  {[
-                    { id: 'value', label: 'Value Savvy', range: '₹8k–15k / trip' },
-                    { id: 'comfort', label: 'Refined Comfort', range: '₹15k–25k / trip' },
-                    { id: 'luxury', label: 'Curated Heritage', range: '₹25k–50k+ / trip' },
-                  ].map((b) => (
+                  {content.step3.budgets.map((b) => (
                     <button
                       key={b.id}
                       type="button"
@@ -182,25 +165,21 @@ export const ColdStartModal: React.FC<ColdStartModalProps> = ({
 
               <div>
                 <label className="text-xs font-bold text-[#1b1b1e] uppercase tracking-wider block mb-2">
-                  Transit Preference
+                  {content.step3.transitLabel}
                 </label>
                 <div className="space-y-2">
-                  {[
-                    { id: 'private-chauffeur', label: 'Private Chauffeur & Scenic Breaks', desc: 'Door-to-door comfort' },
-                    { id: 'scenic-train', label: 'Scenic Ghat Railways & Heritage Rails', desc: 'Scenic slow movement' },
-                    { id: 'self-drive', label: 'Self-Drive SUV on Mountain Passes', desc: 'Active freedom' },
-                  ].map((t) => (
+                  {content.step3.transits.map((tItem) => (
                     <div
-                      key={t.id}
-                      onClick={() => setTransitMode(t.id as UserPreferences['transitMode'])}
+                      key={tItem.id}
+                      onClick={() => setTransitMode(tItem.id as UserPreferences['transitMode'])}
                       className={`px-3.5 py-2.5 rounded-xl border flex items-center justify-between cursor-pointer transition-colors ${
-                        transitMode === t.id
+                        transitMode === tItem.id
                           ? 'border-[#005f50] bg-[#fbf8fc]'
                           : 'border-[#E5E7EB] hover:bg-[#f6f2f7]'
                       }`}
                     >
-                      <span className="text-xs font-semibold text-[#1b1b1e]">{t.label}</span>
-                      <span className="text-[11px] text-[#6e7a75]">{t.desc}</span>
+                      <span className="text-xs font-semibold text-[#1b1b1e]">{tItem.label}</span>
+                      <span className="text-[11px] text-[#6e7a75]">{tItem.desc}</span>
                     </div>
                   ))}
                 </div>
@@ -214,9 +193,9 @@ export const ColdStartModal: React.FC<ColdStartModalProps> = ({
           {step > 1 ? (
             <button
               onClick={() => setStep(step - 1)}
-              className="px-4 py-2 rounded-xl text-xs font-semibold text-[#6e7a75] hover:text-[#1b1b1e] hover:bg-[#f0edf1]"
+              className="px-4 py-2 rounded-xl text-xs font-semibold text-[#6e7a75] hover:text-[#1b1b1e] hover:bg-[#f0edf1] cursor-pointer"
             >
-              Back
+              {t.back || 'Back'}
             </button>
           ) : (
             <div></div>
@@ -225,17 +204,17 @@ export const ColdStartModal: React.FC<ColdStartModalProps> = ({
           {step < 3 ? (
             <button
               onClick={() => setStep(step + 1)}
-              className="px-5 py-2.5 rounded-xl bg-[#4648d4] text-white text-xs font-semibold hover:bg-[#3b3dbb] transition-colors flex items-center gap-1.5"
+              className="px-5 py-2.5 rounded-xl bg-[#4648d4] text-white text-xs font-semibold hover:bg-[#3b3dbb] transition-colors flex items-center gap-1.5 cursor-pointer"
             >
-              <span>Next Step</span>
+              <span>{t.nextStep || t.continueBtn}</span>
               <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
             </button>
           ) : (
             <button
               onClick={handleFinish}
-              className="px-6 py-2.5 rounded-xl bg-[#005f50] text-white text-xs font-semibold hover:bg-[#0d7a68] transition-colors flex items-center gap-1.5 shadow-md"
+              className="px-6 py-2.5 rounded-xl bg-[#005f50] text-white text-xs font-semibold hover:bg-[#0d7a68] transition-colors flex items-center gap-1.5 shadow-md cursor-pointer"
             >
-              <span>Activate Personalized Engine</span>
+              <span>{t.savePreferences || 'Activate Personalized Engine'}</span>
               <span className="material-symbols-outlined text-[16px]">check</span>
             </button>
           )}

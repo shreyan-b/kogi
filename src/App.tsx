@@ -11,8 +11,10 @@ import { RecommendationsScreen } from './screens/RecommendationsScreen';
 import { SavedTripsScreen } from './screens/SavedTripsScreen';
 import { LiveAdaptationScreen } from './screens/LiveAdaptationScreen';
 import { EvaluationDashboardScreen } from './screens/EvaluationDashboardScreen';
+import { LanguageProvider, useLanguage } from './context/LanguageContext';
 
-export default function App() {
+function AppContent() {
+  const { t } = useLanguage();
   const [currentTab, setCurrentTab] = useState<TravelTab>('discover');
   const [searchQuery, setSearchQuery] = useState('');
   const [searchLatency, setSearchLatency] = useState(38);
@@ -59,7 +61,7 @@ export default function App() {
     const existingIndex = savedTrips.findIndex((s) => s.trip.id === trip.id);
     if (existingIndex >= 0) {
       setSavedTrips(savedTrips.filter((s) => s.trip.id !== trip.id));
-      showToast(`Removed "${trip.title}" from Saved Trips`);
+      showToast(`${t.toastRemoved}: "${trip.title}"`);
     } else {
       const newItem: SavedTripItem = {
         id: `saved-${trip.id}-${Date.now()}`,
@@ -70,25 +72,25 @@ export default function App() {
         targetDate: '2026-10-20',
       };
       setSavedTrips([newItem, ...savedTrips]);
-      showToast(`Saved "${trip.title}" to your Travel Portfolio`);
+      showToast(`${t.toastSaved}: "${trip.title}"`);
     }
   };
 
   const handleRemoveTrip = (tripId: string) => {
     setSavedTrips(savedTrips.filter((s) => s.id !== tripId));
-    showToast('Itinerary removed from saved trips');
+    showToast(t.toastRemoved);
   };
 
   const handleUpdateNotes = (tripId: string, notes: string) => {
     setSavedTrips(
       savedTrips.map((s) => (s.id === tripId ? { ...s, notes } : s))
     );
-    showToast('Traveler notes updated successfully');
+    showToast(t.toastNotesUpdated);
   };
 
   const handleSavePreferences = (prefs: UserPreferences) => {
     setUserPreferences(prefs);
-    showToast('Preference baseline calibrated: Cognitive matrix re-indexed!');
+    showToast(t.toastPrefsCalibrated);
   };
 
   const savedTripIds = savedTrips.map((s) => s.trip.id);
@@ -108,51 +110,53 @@ export default function App() {
 
       {/* Main Content Area */}
       <main className="flex-1 w-full pt-16">
-        {currentTab === 'discover' && (
-          <DiscoverScreen
-            onSearch={handleSearch}
-            onSelectTrip={(trip) => setSelectedTripForModal(trip)}
-            onOpenVoiceSearch={() => setVoiceModalOpen(true)}
-            onOpenOnboarding={() => setOnboardingModalOpen(true)}
-            onNavigateTab={(tab) => {
-              setCurrentTab(tab);
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-            }}
-            searchLatency={searchLatency}
-          />
-        )}
+        <div key={currentTab} className="w-full animate-in fade-in duration-150">
+          {currentTab === 'discover' && (
+            <DiscoverScreen
+              onSearch={handleSearch}
+              onSelectTrip={(trip) => setSelectedTripForModal(trip)}
+              onOpenVoiceSearch={() => setVoiceModalOpen(true)}
+              onOpenOnboarding={() => setOnboardingModalOpen(true)}
+              onNavigateTab={(tab) => {
+                setCurrentTab(tab);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+              searchLatency={searchLatency}
+            />
+          )}
 
-        {currentTab === 'recommendations' && (
-          <RecommendationsScreen
-            onSelectTrip={(trip) => setSelectedTripForModal(trip)}
-            onSaveTrip={handleSaveTrip}
-            savedTripIds={savedTripIds}
-            initialSearchQuery={searchQuery}
-          />
-        )}
+          {currentTab === 'recommendations' && (
+            <RecommendationsScreen
+              onSelectTrip={(trip) => setSelectedTripForModal(trip)}
+              onSaveTrip={handleSaveTrip}
+              savedTripIds={savedTripIds}
+              initialSearchQuery={searchQuery}
+            />
+          )}
 
-        {currentTab === 'saved-trips' && (
-          <SavedTripsScreen
-            savedTrips={savedTrips}
-            onRemoveTrip={handleRemoveTrip}
-            onSelectTrip={(trip) => setSelectedTripForModal(trip)}
-            onNavigateDiscover={() => {
-              setCurrentTab('discover');
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-            }}
-            onUpdateNotes={handleUpdateNotes}
-          />
-        )}
+          {currentTab === 'saved-trips' && (
+            <SavedTripsScreen
+              savedTrips={savedTrips}
+              onRemoveTrip={handleRemoveTrip}
+              onSelectTrip={(trip) => setSelectedTripForModal(trip)}
+              onNavigateDiscover={() => {
+                setCurrentTab('discover');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+              onUpdateNotes={handleUpdateNotes}
+            />
+          )}
 
-        {currentTab === 'live-session-adaptation' && (
-          <LiveAdaptationScreen
-            onSelectTrip={(trip) => setSelectedTripForModal(trip)}
-          />
-        )}
+          {currentTab === 'live-session-adaptation' && (
+            <LiveAdaptationScreen
+              onSelectTrip={(trip) => setSelectedTripForModal(trip)}
+            />
+          )}
 
-        {currentTab === 'evaluation-dashboard' && (
-          <EvaluationDashboardScreen />
-        )}
+          {currentTab === 'evaluation-dashboard' && (
+            <EvaluationDashboardScreen />
+          )}
+        </div>
       </main>
 
       {/* Universal Footer */}
@@ -178,13 +182,21 @@ export default function App() {
         isSaved={selectedTripForModal ? savedTripIds.includes(selectedTripForModal.id) : false}
       />
 
-      {/* Global Notification Toast */}
+      {/* Ephemeral Action Toast */}
       {toastMessage && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-[#1b1b1e] text-white px-5 py-2.5 rounded-2xl text-xs font-semibold shadow-2xl flex items-center gap-2 animate-in fade-in slide-in-from-bottom duration-200">
-          <span className="material-symbols-outlined text-[18px] text-[#99f3dd]">check_circle</span>
+        <div className="fixed bottom-6 right-6 z-50 bg-[#1b1b1e] text-white text-xs font-medium px-4 py-2.5 rounded-2xl shadow-2xl flex items-center gap-2 border border-white/10 animate-in fade-in slide-in-from-bottom-2 duration-200">
+          <span className="material-symbols-outlined text-[#99f3dd] text-[18px]">check_circle</span>
           <span>{toastMessage}</span>
         </div>
       )}
     </div>
+  );
+}
+
+export default function App() {
+  return (
+    <LanguageProvider>
+      <AppContent />
+    </LanguageProvider>
   );
 }

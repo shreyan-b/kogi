@@ -1,3 +1,5 @@
+export type LanguageCode = 'en-IN' | 'hi-IN' | 'ml-IN' | 'kn-IN' | 'ta-IN';
+
 export type TravelTab = 'discover' | 'recommendations' | 'saved-trips' | 'live-session-adaptation' | 'evaluation-dashboard';
 
 export interface TravelStyle {
@@ -45,6 +47,13 @@ export interface DestinationTrip {
     lat: number;
     lon: number;
   };
+  latitude?: number;
+  longitude?: number;
+  formattedAddress?: string;
+  location?: string;
+  nearbyCity?: string;
+  placeId?: string;
+  travelStyles?: string[];
   rating?: {
     score: number;
     count: number;
@@ -53,11 +62,24 @@ export interface DestinationTrip {
   stayCategory?: string;
   whyPicked?: string;
   whyPickedTranslations?: {
-    en: string;
-    ml: string;
-    hi: string;
-    ta: string;
+    en?: string;
+    ml?: string;
+    hi?: string;
+    ta?: string;
+    kn?: string;
+    [key: string]: string | undefined;
   };
+  aiExplanation?: {
+    explanation: string;
+    language?: LanguageCode | string;
+    translations?: Record<string, string>;
+    confidence?: number;
+    factors?: string[];
+  };
+  translations?: Record<string, Partial<DestinationTrip>>;
+  bullets?: string[];
+  bulletTranslations?: Record<string, string[]>;
+  weatherSummary?: string;
   signals?: {
     semanticQueryMatch: number;
     preferenceProfile: number;
@@ -65,6 +87,25 @@ export interface DestinationTrip {
     budgetCeilingFit: number;
     quote: string;
   };
+}
+
+export interface LocalizedDestinationTrip extends DestinationTrip {
+  localizedTitle: string;
+  localizedCategory: string;
+  localizedBadge: string;
+  localizedClimate: string;
+  localizedWhyPicked: string;
+  localizedBullets: string[];
+  localizedTags: string[];
+  localizedItinerary: DayItinerary[];
+  localizedCost: string;
+}
+
+export interface LocalizedTravelStyle extends TravelStyle {
+  localizedName: string;
+  localizedBadge: string;
+  localizedDesc: string;
+  localizedStat: string;
 }
 
 export interface SavedTripItem {
@@ -83,3 +124,25 @@ export interface UserPreferences {
   transitMode: 'scenic-train' | 'private-chauffeur' | 'self-drive';
   dietary: string;
 }
+
+export interface AblationReportItem {
+  id: string;
+  metric: string;
+  description: string;
+  retrievalOnly: number;
+  retrievalPlusReranking: number;
+  delta: number;
+  numQueries: number;
+  deltaExplanation: string;
+}
+
+export interface DestinationLocation {
+  name: string;
+  formattedAddress: string;
+  lat: number;
+  lng: number;
+  placeId?: string;
+  nearbyCity?: string;
+}
+
+export type SortOption = 'recommended' | 'rating' | 'price_low' | 'price_high';

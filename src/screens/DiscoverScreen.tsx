@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { DESTINATION_TRIPS, QUICK_PROMPTS, TRAVEL_STYLES } from '../data/mockData';
 import { DestinationTrip, TravelTab } from '../types';
+import { useLanguage } from '../context/LanguageContext';
 
 interface DiscoverScreenProps {
   onSearch: (query: string) => void;
@@ -19,6 +20,7 @@ export const DiscoverScreen: React.FC<DiscoverScreenProps> = ({
   onNavigateTab,
   searchLatency,
 }) => {
+  const { t, localizeTravelStyle, localizeTrip, localizeContent } = useLanguage();
   const [searchInput, setSearchInput] = useState('');
   const [isSynthesizing, setIsSynthesizing] = useState(false);
   const [bannerVisible, setBannerVisible] = useState(true);
@@ -88,10 +90,10 @@ export const DiscoverScreen: React.FC<DiscoverScreenProps> = ({
 
           {/* Main Headline */}
           <h1 className="text-4xl sm:text-5xl lg:text-[48px] font-semibold text-[#1b1b1e] tracking-tight max-w-2xl text-balance leading-tight sm:leading-[56px]">
-            Where are you headed?
+            {t.discoverTitle}
           </h1>
           <p className="text-base sm:text-lg text-[#3e4946] mt-2 max-w-xl text-balance">
-            Tell Sarathi what you're looking for in your own words. No rigid checkboxes — just your natural intent.
+            {t.discoverSubtitle}
           </p>
 
           {/* Master Natural-Language Search Container */}
@@ -133,7 +135,7 @@ export const DiscoverScreen: React.FC<DiscoverScreenProps> = ({
                       if (e.key === 'Enter') handleSearchSubmit();
                     }}
                     className="w-full bg-transparent text-base text-[#1b1b1e] placeholder:text-[#6e7a75]/70 focus:outline-none py-2 px-1"
-                    placeholder="Somewhere relaxing near Munnar, not too pricey with mist views..."
+                    placeholder={t.searchPlaceholder}
                     type="text"
                   />
                 </div>
@@ -143,7 +145,7 @@ export const DiscoverScreen: React.FC<DiscoverScreenProps> = ({
                   {isSynthesizing && (
                     <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#f0edf1] text-[#005f50] text-[11px] font-semibold animate-pulse">
                       <span className="w-1.5 h-1.5 rounded-full bg-[#005f50] animate-ping"></span>
-                      <span>Synthesizing intent...</span>
+                      <span>{t.synthesizing}</span>
                     </div>
                   )}
 
@@ -153,7 +155,7 @@ export const DiscoverScreen: React.FC<DiscoverScreenProps> = ({
                     className="h-[46px] px-5 rounded-xl bg-[#005f50] text-white text-xs font-semibold tracking-wide flex items-center justify-center gap-1.5 hover:bg-[#0d7a68] active:scale-[0.98] transition-all shadow-md hover:shadow-lg disabled:opacity-75 cursor-pointer"
                     type="button"
                   >
-                    <span>Ask Sarathi</span>
+                    <span>{t.synthesizeBtn}</span>
                     <span className="material-symbols-outlined text-[18px]">explore</span>
                   </button>
                 </div>
@@ -163,7 +165,7 @@ export const DiscoverScreen: React.FC<DiscoverScreenProps> = ({
             {/* Quick Query Intent Chips */}
             <div className="mt-3 flex flex-wrap items-center justify-center gap-1.5">
               <span className="text-[11px] text-[#6e7a75] uppercase tracking-wider mr-1">
-                Try phrasing:
+                {t.quickTries}:
               </span>
               {QUICK_PROMPTS.map((chip, idx) => (
                 <button
@@ -230,7 +232,7 @@ export const DiscoverScreen: React.FC<DiscoverScreenProps> = ({
                 </span>
               </div>
               <h2 className="text-2xl sm:text-3xl font-semibold text-[#1b1b1e] tracking-tight">
-                Explore based on your travel style
+                {t.exploreTravelStyles}
               </h2>
               <p className="text-sm text-[#3e4946] mt-1">
                 Curated vector embeddings tailored to your mood and pacing
@@ -245,76 +247,79 @@ export const DiscoverScreen: React.FC<DiscoverScreenProps> = ({
 
           {/* 6 Refined Style Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {TRAVEL_STYLES.map((style) => (
-              <div
-                key={style.id}
-                onClick={() => {
-                  triggerSimulation(style.intentQuery);
-                  window.scrollTo({ top: 0, behavior: 'smooth' });
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
+            {TRAVEL_STYLES.map((style) => {
+              const locStyle = localizeTravelStyle(style);
+              return (
+                <div
+                  key={style.id}
+                  onClick={() => {
                     triggerSimulation(style.intentQuery);
                     window.scrollTo({ top: 0, behavior: 'smooth' });
-                  }
-                }}
-                tabIndex={0}
-                role="button"
-                className="group flex flex-col justify-between rounded-2xl bg-white p-5 shadow-xs hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden relative border border-[#E5E7EB]"
-              >
-                <div
-                  className={`absolute top-0 right-0 w-36 h-36 rounded-full blur-2xl -mr-12 -mt-12 transition-colors ${
-                    style.badgeColor === 'primary'
-                      ? 'bg-[#99f3dd]/20 group-hover:bg-[#99f3dd]/40'
-                      : style.badgeColor === 'secondary'
-                      ? 'bg-[#e1e0ff]/25 group-hover:bg-[#e1e0ff]/45'
-                      : 'bg-[#71f8e4]/25 group-hover:bg-[#71f8e4]/45'
-                  }`}
-                ></div>
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      triggerSimulation(style.intentQuery);
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }
+                  }}
+                  tabIndex={0}
+                  role="button"
+                  className="group flex flex-col justify-between rounded-2xl bg-white p-5 shadow-xs hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden relative border border-[#E5E7EB]"
+                >
+                  <div
+                    className={`absolute top-0 right-0 w-36 h-36 rounded-full blur-2xl -mr-12 -mt-12 transition-colors ${
+                      style.badgeColor === 'primary'
+                        ? 'bg-[#99f3dd]/20 group-hover:bg-[#99f3dd]/40'
+                        : style.badgeColor === 'secondary'
+                        ? 'bg-[#e1e0ff]/25 group-hover:bg-[#e1e0ff]/45'
+                        : 'bg-[#71f8e4]/25 group-hover:bg-[#71f8e4]/45'
+                    }`}
+                  ></div>
 
-                <div>
-                  <div className="flex items-center justify-between">
-                    <div
-                      className={`w-12 h-12 rounded-xl flex items-center justify-center transition-transform group-hover:scale-110 ${
-                        style.badgeColor === 'primary'
-                          ? 'bg-[#99f3dd] text-[#00201a]'
-                          : style.badgeColor === 'secondary'
-                          ? 'bg-[#e1e0ff] text-[#2f2ebe]'
-                          : 'bg-[#71f8e4] text-[#00201c]'
-                      }`}
-                    >
-                      <span className="material-symbols-outlined text-[24px]">{style.icon}</span>
+                  <div>
+                    <div className="flex items-center justify-between">
+                      <div
+                        className={`w-12 h-12 rounded-xl flex items-center justify-center transition-transform group-hover:scale-110 ${
+                          style.badgeColor === 'primary'
+                            ? 'bg-[#99f3dd] text-[#00201a]'
+                            : style.badgeColor === 'secondary'
+                            ? 'bg-[#e1e0ff] text-[#2f2ebe]'
+                            : 'bg-[#71f8e4] text-[#00201c]'
+                        }`}
+                      >
+                        <span className="material-symbols-outlined text-[24px]">{style.icon}</span>
+                      </div>
+                      <span
+                        className={`text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-[#f6f2f7] ${
+                          style.badgeColor === 'primary'
+                            ? 'text-[#005f50]'
+                            : style.badgeColor === 'secondary'
+                            ? 'text-[#4648d4]'
+                            : 'text-[#005f55]'
+                        }`}
+                      >
+                        {locStyle.localizedBadge}
+                      </span>
                     </div>
-                    <span
-                      className={`text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-[#f6f2f7] ${
-                        style.badgeColor === 'primary'
-                          ? 'text-[#005f50]'
-                          : style.badgeColor === 'secondary'
-                          ? 'text-[#4648d4]'
-                          : 'text-[#005f55]'
-                      }`}
-                    >
-                      {style.badge}
-                    </span>
+
+                    <h3 className="text-xl text-[#1b1b1e] mt-4 font-semibold">{locStyle.localizedName}</h3>
+                    <p className="text-sm text-[#3e4946] mt-1">{locStyle.localizedDesc}</p>
                   </div>
 
-                  <h3 className="text-xl text-[#1b1b1e] mt-4 font-semibold">{style.name}</h3>
-                  <p className="text-sm text-[#3e4946] mt-1">{style.description}</p>
+                  <div className="mt-5 pt-3 border-t border-[#f0edf1] flex items-center justify-between">
+                    <span className="text-[11px] text-[#6e7a75]">{locStyle.localizedStat}</span>
+                    <span
+                      className={`material-symbols-outlined text-[20px] transition-transform group-hover:translate-x-1 ${
+                        style.badgeColor === 'secondary' ? 'text-[#4648d4]' : 'text-[#005f50]'
+                      }`}
+                    >
+                      arrow_forward
+                    </span>
+                  </div>
                 </div>
-
-                <div className="mt-5 pt-3 border-t border-[#f0edf1] flex items-center justify-between">
-                  <span className="text-[11px] text-[#6e7a75]">{style.statLabel}</span>
-                  <span
-                    className={`material-symbols-outlined text-[20px] transition-transform group-hover:translate-x-1 ${
-                      style.badgeColor === 'secondary' ? 'text-[#4648d4]' : 'text-[#005f50]'
-                    }`}
-                  >
-                    arrow_forward
-                  </span>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
@@ -325,58 +330,61 @@ export const DiscoverScreen: React.FC<DiscoverScreenProps> = ({
           <div className="flex flex-col md:flex-row items-start md:items-end justify-between mb-5 gap-2">
             <div>
               <span className="text-[11px] text-[#005f55] uppercase font-bold tracking-wider">
-                Live Real-World Trajectories
+                {t('realWorldTrajectories', 'Live Real-World Trajectories')}
               </span>
               <h2 className="text-xl sm:text-2xl font-semibold text-[#1b1b1e] mt-0.5">
-                Trips synthesized from traveler prompts
+                {t('tripsSynthesizedPrompt', 'Trips synthesized from traveler prompts')}
               </h2>
             </div>
             <span className="text-[13px] text-[#6e7a75]">
-              Updated 14 mins ago via Sarathi Neural Gateway
+              {t('neuralGatewayNotice', 'Updated via Sarathi Neural Gateway')}
             </span>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-            {DESTINATION_TRIPS.slice(0, 3).map((spot) => (
-              <div
-                key={spot.id}
-                onClick={() => onSelectTrip(spot)}
-                className="bg-white rounded-2xl overflow-hidden shadow-xs hover:shadow-xl transition-all group flex flex-col border border-[#E5E7EB] cursor-pointer"
-              >
-                <div className="relative h-56 w-full overflow-hidden">
-                  <img
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                    src={spot.imageUrl}
-                    alt={spot.title}
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#1b1b1e]/85 via-transparent to-transparent"></div>
-                  <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between text-white">
-                    <div>
-                      <p className="text-base font-semibold leading-tight">{spot.title}</p>
-                      <p className="text-[11px] opacity-90">{spot.region}</p>
+            {DESTINATION_TRIPS.slice(0, 3).map((spot) => {
+              const locSpot = localizeTrip(spot);
+              return (
+                <div
+                  key={spot.id}
+                  onClick={() => onSelectTrip(spot)}
+                  className="bg-white rounded-2xl overflow-hidden shadow-xs hover:shadow-xl transition-all group flex flex-col border border-[#E5E7EB] cursor-pointer"
+                >
+                  <div className="relative h-56 w-full overflow-hidden">
+                    <img
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                      src={spot.imageUrl}
+                      alt={spot.title}
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#1b1b1e]/85 via-transparent to-transparent"></div>
+                    <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between text-white">
+                      <div>
+                        <p className="text-base font-semibold leading-tight">{locSpot.localizedTitle}</p>
+                        <p className="text-[11px] opacity-90">{spot.region}</p>
+                      </div>
+                      <span className="px-2 py-1 rounded bg-white/20 backdrop-blur-md text-white text-[11px] font-semibold">
+                        {spot.matchScore}% {t.matchBadge}
+                      </span>
                     </div>
-                    <span className="px-2 py-1 rounded bg-white/20 backdrop-blur-md text-white text-[11px] font-semibold">
-                      {spot.matchScore}% Match
-                    </span>
                   </div>
-                </div>
 
-                <div className="p-4 flex-1 flex flex-col justify-between">
-                  <p className="text-[13px] text-[#3e4946] italic leading-relaxed">
-                    {spot.quotePrompt}
-                  </p>
-                  <div className="mt-3 pt-2 border-t border-[#f0edf1] flex items-center justify-between text-[#6e7a75] text-[11px]">
-                    <span className="flex items-center gap-1 font-medium">
-                      <span className="material-symbols-outlined text-[16px]">{spot.metaIcon}</span>
-                      {spot.metaBadge}
-                    </span>
-                    <span className="text-[#005f50] font-semibold">
-                      {spot.duration} • {spot.cost}
-                    </span>
+                  <div className="p-4 flex-1 flex flex-col justify-between">
+                    <p className="text-[13px] text-[#3e4946] italic leading-relaxed">
+                      {spot.quotePrompt}
+                    </p>
+                    <div className="mt-3 pt-2 border-t border-[#f0edf1] flex items-center justify-between text-[#6e7a75] text-[11px]">
+                      <span className="flex items-center gap-1 font-medium">
+                        <span className="material-symbols-outlined text-[16px]">{spot.metaIcon}</span>
+                        {locSpot.localizedBadge}
+                      </span>
+                      <span className="text-[#005f50] font-semibold">
+                        {spot.duration} • {locSpot.localizedCost}
+                      </span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           {/* More curated button */}
@@ -385,7 +393,7 @@ export const DiscoverScreen: React.FC<DiscoverScreenProps> = ({
               onClick={() => onNavigateTab('recommendations')}
               className="px-5 py-2.5 rounded-xl bg-white border border-[#E5E7EB] text-xs font-semibold text-[#1b1b1e] hover:bg-[#f0edf1] shadow-xs flex items-center gap-2 transition-all cursor-pointer"
             >
-              <span>View All 14,280 Indexed Trajectories</span>
+              <span>{t('viewAllTrajectories', 'View All 14,280 Indexed Trajectories')}</span>
               <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
             </button>
           </div>
@@ -415,7 +423,7 @@ export const DiscoverScreen: React.FC<DiscoverScreenProps> = ({
               >
                 tune
               </span>
-              <span className="text-xs font-semibold text-[#1b1b1e]">First time here?</span>
+              <span className="text-xs font-semibold text-[#1b1b1e]">{t.calibrateBaseline}</span>
             </div>
 
             <p className="text-[13px] text-[#3e4946]">
@@ -431,7 +439,7 @@ export const DiscoverScreen: React.FC<DiscoverScreenProps> = ({
                 className="flex-1 py-2 px-3 rounded-xl bg-[#4648d4] text-white text-xs font-semibold flex items-center justify-center gap-1 hover:bg-[#3b3dbb] active:scale-[0.98] transition-all shadow-xs cursor-pointer"
                 type="button"
               >
-                <span>Launch Onboarding</span>
+                <span>{t.calibrateBaseline}</span>
                 <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
               </button>
 
@@ -440,7 +448,7 @@ export const DiscoverScreen: React.FC<DiscoverScreenProps> = ({
                 className="py-2 px-2.5 text-xs text-[#6e7a75] hover:text-[#1b1b1e] transition-colors cursor-pointer"
                 type="button"
               >
-                Skip
+                {t.skipForNow || 'Skip'}
               </button>
             </div>
           </div>

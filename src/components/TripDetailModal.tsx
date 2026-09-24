@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { DestinationTrip } from '../types';
 import { WeatherForecastWidget } from './WeatherForecastWidget';
+import { useLanguage } from '../context/LanguageContext';
 
 interface TripDetailModalProps {
   trip: DestinationTrip | null;
@@ -15,6 +16,7 @@ export const TripDetailModal: React.FC<TripDetailModalProps> = ({
   onSaveTrip,
   isSaved,
 }) => {
+  const { t, localizeTrip, localizeContent } = useLanguage();
   const [activeDay, setActiveDay] = useState(1);
   const [bookingToast, setBookingToast] = useState(false);
   const [selectedTargetDate, setSelectedTargetDate] = useState<string>(() => {
@@ -24,6 +26,12 @@ export const TripDetailModal: React.FC<TripDetailModalProps> = ({
   });
 
   if (!trip) return null;
+
+  const loc = localizeTrip(trip);
+  const displayClimate = loc.localizedClimate;
+  const displayBadge = loc.localizedBadge;
+  const displayTags = loc.localizedTags;
+  const itineraryItems = loc.localizedItinerary.length > 0 ? loc.localizedItinerary : trip.itinerary;
 
   const handleBook = () => {
     setBookingToast(true);
@@ -61,21 +69,21 @@ export const TripDetailModal: React.FC<TripDetailModalProps> = ({
             <div>
               <div className="flex items-center gap-2 mb-1.5">
                 <span className="px-2.5 py-0.5 rounded-full bg-[#005f50] text-white text-[11px] font-semibold">
-                  {trip.style}
+                  {localizeContent(trip.style)}
                 </span>
-                <span className="px-2 py-0.5 rounded-full bg-white/20 backdrop-blur-md text-[11px] font-semibold">
-                  {trip.metaBadge}
+                <span className="px-2.5 py-0.5 rounded-full bg-white/20 backdrop-blur-md text-[11px] font-semibold">
+                  {displayBadge}
                 </span>
               </div>
-              <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">{trip.title}</h2>
+              <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">{loc.localizedTitle}</h2>
               <p className="text-xs sm:text-sm text-white/90">{trip.region}</p>
             </div>
 
             <div className="flex items-center sm:flex-col sm:items-end gap-2 sm:gap-1">
               <span className="px-2.5 py-1 rounded-lg bg-[#99f3dd] text-[#00201a] font-bold text-xs">
-                {trip.matchScore}% Cognitive Match
+                {trip.matchScore}% {t.cognitiveMatch || 'Cognitive Match'}
               </span>
-              <span className="text-lg font-bold text-white">{trip.cost}</span>
+              <span className="text-lg font-bold text-white">{loc.localizedCost}</span>
             </div>
           </div>
         </div>
@@ -85,13 +93,13 @@ export const TripDetailModal: React.FC<TripDetailModalProps> = ({
           {/* Prompt Quote & Intent Synthesis */}
           <div className="p-4 rounded-2xl bg-[#f6f2f7] border border-[#E5E7EB]">
             <span className="text-[10px] font-bold uppercase tracking-wider text-[#005f50]">
-              Synthesized Traveler Intent
+              {t.synthesizedIntent || 'Synthesized Traveler Intent'}
             </span>
             <p className="text-xs sm:text-sm text-[#1b1b1e] italic mt-1 leading-relaxed">
               {trip.quotePrompt}
             </p>
             <div className="flex flex-wrap gap-1.5 mt-3">
-              {trip.intentTags.map((tag, idx) => (
+              {displayTags.map((tag, idx) => (
                 <span
                   key={idx}
                   className="text-[11px] px-2.5 py-0.5 rounded-full bg-white text-[#3e4946] border border-[#E5E7EB]"
@@ -105,19 +113,19 @@ export const TripDetailModal: React.FC<TripDetailModalProps> = ({
           {/* Quick Telemetry Grid */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-left">
             <div className="p-3 rounded-xl bg-[#fbf8fc] border border-[#E5E7EB]">
-              <span className="text-[10px] text-[#6e7a75] uppercase block">Micro-Climate</span>
-              <span className="text-xs font-bold text-[#1b1b1e] mt-0.5 block">{trip.climate}</span>
+              <span className="text-[10px] text-[#6e7a75] uppercase block">{t.microClimate || 'Micro-Climate'}</span>
+              <span className="text-xs font-bold text-[#1b1b1e] mt-0.5 block">{displayClimate}</span>
             </div>
             <div className="p-3 rounded-xl bg-[#fbf8fc] border border-[#E5E7EB]">
-              <span className="text-[10px] text-[#6e7a75] uppercase block">Elevation</span>
+              <span className="text-[10px] text-[#6e7a75] uppercase block">{t.elevation || 'Elevation'}</span>
               <span className="text-xs font-bold text-[#1b1b1e] mt-0.5 block">{trip.elevation}</span>
             </div>
             <div className="p-3 rounded-xl bg-[#fbf8fc] border border-[#E5E7EB]">
-              <span className="text-[10px] text-[#6e7a75] uppercase block">Crowd Friction</span>
-              <span className="text-xs font-bold text-[#005f50] mt-0.5 block">{trip.crowdLevel} (Sparse)</span>
+              <span className="text-[10px] text-[#6e7a75] uppercase block">{t.crowdFriction || 'Crowd Friction'}</span>
+              <span className="text-xs font-bold text-[#005f50] mt-0.5 block">{localizeContent(trip.crowdLevel)} ({t.sparse || 'Sparse'})</span>
             </div>
             <div className="p-3 rounded-xl bg-[#fbf8fc] border border-[#E5E7EB]">
-              <span className="text-[10px] text-[#6e7a75] uppercase block">Optimal Window</span>
+              <span className="text-[10px] text-[#6e7a75] uppercase block">{t.optimalWindow || 'Optimal Window'}</span>
               <span className="text-xs font-bold text-[#1b1b1e] mt-0.5 block">{trip.bestTime}</span>
             </div>
           </div>
@@ -133,10 +141,10 @@ export const TripDetailModal: React.FC<TripDetailModalProps> = ({
           <div>
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-sm font-bold text-[#1b1b1e] uppercase tracking-wider">
-                Daily Cadence & Itinerary
+                {t.dailyCadenceItinerary || 'Daily Cadence & Itinerary'}
               </h3>
               <div className="flex gap-1">
-                {trip.itinerary.map((item) => (
+                {itineraryItems.map((item) => (
                   <button
                     key={item.day}
                     onClick={() => setActiveDay(item.day)}
@@ -146,41 +154,41 @@ export const TripDetailModal: React.FC<TripDetailModalProps> = ({
                         : 'bg-[#f0edf1] text-[#3e4946] hover:bg-[#eae7eb]'
                     }`}
                   >
-                    Day {item.day}
+                    {t.dayLabel || 'Day'} {item.day}
                   </button>
                 ))}
               </div>
             </div>
 
-            {trip.itinerary
+            {itineraryItems
               .filter((item) => item.day === activeDay)
               .map((dayItem) => (
                 <div key={dayItem.day} className="p-4 rounded-2xl border border-[#E5E7EB] bg-white space-y-3">
                   <div className="flex items-center justify-between border-b border-[#f0edf1] pb-2">
                     <h4 className="text-sm font-bold text-[#1b1b1e]">{dayItem.title}</h4>
                     <span className="text-[11px] text-[#005f50] font-semibold">
-                      Stay: {dayItem.stay}
+                      Stay: {localizeContent(dayItem.stay)}
                     </span>
                   </div>
 
                   <div className="space-y-2 text-xs">
                     <div className="flex items-start gap-2">
-                      <span className="w-16 font-semibold text-[#6e7a75] shrink-0">Morning</span>
+                      <span className="w-20 font-semibold text-[#6e7a75] shrink-0">{t.dayMorning || 'Morning'}</span>
                       <span className="text-[#1b1b1e]">{dayItem.morning}</span>
                     </div>
                     <div className="flex items-start gap-2">
-                      <span className="w-16 font-semibold text-[#6e7a75] shrink-0">Afternoon</span>
+                      <span className="w-20 font-semibold text-[#6e7a75] shrink-0">{t.dayAfternoon || 'Afternoon'}</span>
                       <span className="text-[#1b1b1e]">{dayItem.afternoon}</span>
                     </div>
                     <div className="flex items-start gap-2">
-                      <span className="w-16 font-semibold text-[#6e7a75] shrink-0">Evening</span>
+                      <span className="w-20 font-semibold text-[#6e7a75] shrink-0">{t.dayEvening || 'Evening'}</span>
                       <span className="text-[#1b1b1e]">{dayItem.evening}</span>
                     </div>
                   </div>
 
                   <div className="pt-2 border-t border-[#f0edf1] flex items-center gap-2 text-xs text-[#4648d4] font-medium bg-[#f6f2f7] p-2.5 rounded-xl">
                     <span className="material-symbols-outlined text-[16px]">stars</span>
-                    <span><strong>Key moment:</strong> {dayItem.highlight}</span>
+                    <span><strong>{t.keyMoment || 'Key moment'}:</strong> {dayItem.highlight}</span>
                   </div>
                 </div>
               ))}
@@ -200,7 +208,7 @@ export const TripDetailModal: React.FC<TripDetailModalProps> = ({
             <span className="material-symbols-outlined text-[18px]">
               {isSaved ? 'bookmark_added' : 'bookmark_add'}
             </span>
-            <span>{isSaved ? 'Saved in My Trips' : 'Save Itinerary'}</span>
+            <span>{isSaved ? t.savedInTrip : t.saveToTrip}</span>
           </button>
 
           <div className="flex items-center gap-2">
@@ -208,7 +216,7 @@ export const TripDetailModal: React.FC<TripDetailModalProps> = ({
               onClick={handleBook}
               className="px-6 py-2.5 rounded-xl bg-[#005f50] text-white text-xs font-semibold hover:bg-[#0d7a68] transition-colors flex items-center gap-1.5 shadow-md cursor-pointer"
             >
-              <span>Instant Reserve for {selectedTargetDate}</span>
+              <span>{t.instantReserveFor || 'Instant Reserve for'} {selectedTargetDate}</span>
               <span className="material-symbols-outlined text-[16px]">flight_takeoff</span>
             </button>
           </div>

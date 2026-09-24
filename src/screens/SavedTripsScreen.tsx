@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { DestinationTrip, SavedTripItem } from '../types';
+import { useLanguage } from '../context/LanguageContext';
 
 interface SavedTripsScreenProps {
   savedTrips: SavedTripItem[];
@@ -16,6 +17,7 @@ export const SavedTripsScreen: React.FC<SavedTripsScreenProps> = ({
   onNavigateDiscover,
   onUpdateNotes,
 }) => {
+  const { t, localizeTrip, localizeContent, formatCurrency } = useLanguage();
   const [editingNotesId, setEditingNotesId] = useState<string | null>(null);
   const [tempNotes, setTempNotes] = useState('');
   const [exportToast, setExportToast] = useState(false);
@@ -38,21 +40,25 @@ export const SavedTripsScreen: React.FC<SavedTripsScreenProps> = ({
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 w-full">
+    <div className="max-w-[1360px] mx-auto px-4 sm:px-6 lg:px-10 py-7 md:py-10 w-full text-[#1b1b1e] antialiased">
       {/* Header & Travel Portfolio Overview */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
-        <div>
-          <div className="flex items-center gap-2 mb-1.5">
-            <span className="w-2 h-2 rounded-full bg-[#005f50]"></span>
-            <span className="text-[11px] text-[#005f50] uppercase font-bold tracking-wider">
-              Travel Portfolio
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-6 border-b border-[#E5E7EB] mb-8">
+        <div className="flex flex-col gap-1.5 max-w-2xl">
+          <div className="flex items-center gap-2 text-[#005f50]">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#005f50]"></span>
+            <span className="text-[11px] font-bold tracking-[0.14em] uppercase">
+              {t.savedEyebrow}
+            </span>
+            <span className="text-[#BDC9C4]">/</span>
+            <span className="text-[11px] font-semibold text-[#52525B]">
+              {t.personalizedItineraries || 'Personalized Itineraries'}
             </span>
           </div>
-          <h1 className="text-3xl font-bold text-[#1b1b1e] tracking-tight">
-            Your Curated Journeys
+          <h1 className="text-3xl sm:text-[34px] font-semibold text-[#18181B] tracking-tight">
+            {t.savedTitle}
           </h1>
-          <p className="text-sm text-[#3e4946] mt-1">
-            Personalized itineraries ready for departures, tailored to your pace and climatic preferences.
+          <p className="text-sm text-[#52525B] leading-relaxed">
+            {t.savedSubtitle}
           </p>
         </div>
 
@@ -60,10 +66,10 @@ export const SavedTripsScreen: React.FC<SavedTripsScreenProps> = ({
           <div className="flex items-center gap-3">
             <button
               onClick={handleExport}
-              className="px-4 py-2 rounded-xl bg-white border border-[#E5E7EB] text-xs font-semibold text-[#1b1b1e] hover:bg-[#f6f2f7] shadow-xs flex items-center gap-1.5 transition-colors cursor-pointer"
+              className="px-4 py-2 rounded-xl bg-white border border-[#E5E7EB] text-xs font-semibold text-[#18181B] hover:bg-[#FAF9F6] shadow-xs flex items-center gap-1.5 transition-colors cursor-pointer"
             >
-              <span className="material-symbols-outlined text-[16px]">share</span>
-              <span>Export Portfolio</span>
+              <span className="material-symbols-outlined text-[16px] text-[#005f50]">share</span>
+              <span>{t.exportPortfolio}</span>
             </button>
           </div>
         )}
@@ -77,9 +83,9 @@ export const SavedTripsScreen: React.FC<SavedTripsScreenProps> = ({
               <span className="material-symbols-outlined text-[20px]">map</span>
             </div>
             <div>
-              <span className="text-[11px] text-[#6e7a75] uppercase">Total Saved</span>
+              <span className="text-[11px] text-[#6e7a75] uppercase">{t.totalSaved || 'Total Saved'}</span>
               <span className="text-lg font-bold text-[#1b1b1e] block">
-                {savedTrips.length} Destinations
+                {savedTrips.length} {t.destinationsCount || 'Destinations'}
               </span>
             </div>
           </div>
@@ -89,9 +95,9 @@ export const SavedTripsScreen: React.FC<SavedTripsScreenProps> = ({
               <span className="material-symbols-outlined text-[20px]">payments</span>
             </div>
             <div>
-              <span className="text-[11px] text-[#6e7a75] uppercase">Combined Estimated Budget</span>
+              <span className="text-[11px] text-[#6e7a75] uppercase">{t.combinedEstimatedBudget || 'Combined Estimated Budget'}</span>
               <span className="text-lg font-bold text-[#4648d4] block">
-                ₹{totalBudget.toLocaleString('en-IN')}
+                {formatCurrency(totalBudget)}
               </span>
             </div>
           </div>
@@ -101,8 +107,8 @@ export const SavedTripsScreen: React.FC<SavedTripsScreenProps> = ({
               <span className="material-symbols-outlined text-[20px]">verified</span>
             </div>
             <div>
-              <span className="text-[11px] text-[#6e7a75] uppercase">Vector Coherence</span>
-              <span className="text-lg font-bold text-[#005f50] block">96.8% Average</span>
+              <span className="text-[11px] text-[#6e7a75] uppercase">{t.vectorCoherence || 'Vector Coherence'}</span>
+              <span className="text-lg font-bold text-[#005f50] block">96.8% {t.average || 'Average'}</span>
             </div>
           </div>
         </div>
@@ -114,15 +120,15 @@ export const SavedTripsScreen: React.FC<SavedTripsScreenProps> = ({
           <div className="w-16 h-16 rounded-full bg-[#f6f2f7] text-[#005f50] flex items-center justify-center mx-auto mb-4">
             <span className="material-symbols-outlined text-[32px]">bookmark_border</span>
           </div>
-          <h3 className="text-lg font-bold text-[#1b1b1e]">No saved itineraries yet</h3>
+          <h3 className="text-lg font-bold text-[#1b1b1e]">{t.savedEmptyTitle}</h3>
           <p className="text-xs text-[#6e7a75] mt-1 max-w-sm mx-auto leading-relaxed">
-            Bookmark trajectories from the Discover feed or Recommendations page to assemble your dream South India or Himalayan journey.
+            {t.savedEmptySub}
           </p>
           <button
             onClick={onNavigateDiscover}
             className="mt-6 px-6 py-2.5 rounded-xl bg-[#005f50] text-white text-xs font-semibold hover:bg-[#0d7a68] transition-all shadow-md inline-flex items-center gap-2 cursor-pointer"
           >
-            <span>Explore Destinations</span>
+            <span>{t.exploreDestinations}</span>
             <span className="material-symbols-outlined text-[16px]">explore</span>
           </button>
         </div>
@@ -130,7 +136,9 @@ export const SavedTripsScreen: React.FC<SavedTripsScreenProps> = ({
         <div className="space-y-6">
           {savedTrips.map((item) => {
             const trip = item.trip;
+            const loc = localizeTrip(trip);
             const isEditing = editingNotesId === item.id;
+            const itineraryItems = loc.localizedItinerary.length > 0 ? loc.localizedItinerary : trip.itinerary;
 
             return (
               <div
@@ -150,9 +158,9 @@ export const SavedTripsScreen: React.FC<SavedTripsScreenProps> = ({
                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent"></div>
                   <div className="absolute bottom-3 left-3 right-3 text-white">
                     <span className="text-[10px] uppercase font-bold bg-[#005f50] px-2 py-0.5 rounded-md">
-                      {trip.style}
+                      {localizeContent(trip.style)}
                     </span>
-                    <h3 className="text-base font-bold mt-1">{trip.title}</h3>
+                    <h3 className="text-base font-bold mt-1">{loc.localizedTitle}</h3>
                   </div>
                 </div>
 
@@ -166,18 +174,18 @@ export const SavedTripsScreen: React.FC<SavedTripsScreenProps> = ({
                         </span>
                         <span className="text-xs text-[#bdc9c4]">•</span>
                         <span className="text-xs text-[#6e7a75]">
-                          Saved on {item.savedAt}
+                          {t.savedOnDate || 'Saved on'} {item.savedAt}
                         </span>
                       </div>
 
                       <div className="flex items-center gap-2">
                         <span className="text-xs font-bold text-[#1b1b1e]">
-                          {trip.duration} • {trip.cost}
+                          {trip.duration} • {loc.localizedCost}
                         </span>
                         <button
                           onClick={() => onRemoveTrip(item.id)}
-                          className="text-[#6e7a75] hover:text-[#ba1a1a] p-1 rounded-lg hover:bg-[#ffdad6]/40 transition-colors"
-                          title="Remove from saved"
+                          className="text-[#6e7a75] hover:text-[#ba1a1a] p-1 rounded-lg hover:bg-[#ffdad6]/40 transition-colors cursor-pointer"
+                          title={t.removeTrip}
                         >
                           <span className="material-symbols-outlined text-[18px]">delete</span>
                         </button>
@@ -190,12 +198,12 @@ export const SavedTripsScreen: React.FC<SavedTripsScreenProps> = ({
 
                     {/* Highlights pill tags */}
                     <div className="flex flex-wrap gap-1.5 mb-4">
-                      {trip.itinerary.map((day) => (
+                      {itineraryItems.map((day) => (
                         <div
                           key={day.day}
                           className="px-2.5 py-1 rounded-xl bg-[#f6f2f7] border border-[#E5E7EB] text-[11px] text-[#1b1b1e]"
                         >
-                          <strong className="text-[#005f50]">Day {day.day}:</strong> {day.title.slice(0, 32)}...
+                          <strong className="text-[#005f50]">{t.dayLabel || 'Day'} {day.day}:</strong> {day.title.slice(0, 32)}...
                         </div>
                       ))}
                     </div>
@@ -205,14 +213,14 @@ export const SavedTripsScreen: React.FC<SavedTripsScreenProps> = ({
                       <div className="flex items-center justify-between mb-1">
                         <span className="text-[10px] uppercase font-bold text-[#6e7a75] flex items-center gap-1">
                           <span className="material-symbols-outlined text-[14px]">edit_note</span>
-                          Traveler Custom Notes & Special Requests
+                          {t.travelerNotes}
                         </span>
                         {!isEditing && (
                           <button
                             onClick={() => handleStartEditNotes(item)}
-                            className="text-[11px] text-[#005f50] font-semibold hover:underline"
+                            className="text-[11px] text-[#005f50] font-semibold hover:underline cursor-pointer"
                           >
-                            Edit
+                            {t.editNotes}
                           </button>
                         )}
                       </div>
@@ -222,28 +230,28 @@ export const SavedTripsScreen: React.FC<SavedTripsScreenProps> = ({
                           <textarea
                             value={tempNotes}
                             onChange={(e) => setTempNotes(e.target.value)}
-                            placeholder="Add your departure date, room preference, dietary requests..."
+                            placeholder={t.addNotesPlaceholder}
                             className="w-full text-xs p-2.5 rounded-xl border border-[#005f50] bg-white focus:outline-none"
                             rows={2}
                           />
                           <div className="flex justify-end gap-2">
                             <button
                               onClick={() => setEditingNotesId(null)}
-                              className="px-2.5 py-1 text-xs text-[#6e7a75]"
+                              className="px-2.5 py-1 text-xs text-[#6e7a75] cursor-pointer"
                             >
-                              Cancel
+                              {t.cancel}
                             </button>
                             <button
                               onClick={() => handleSaveNotes(item.id)}
-                              className="px-3 py-1 bg-[#005f50] text-white text-xs font-semibold rounded-lg"
+                              className="px-3 py-1 bg-[#005f50] text-white text-xs font-semibold rounded-lg cursor-pointer"
                             >
-                              Save Note
+                              {t.saveNotes}
                             </button>
                           </div>
                         </div>
                       ) : (
                         <p className="text-xs text-[#3e4946]">
-                          {item.notes || 'No custom notes added. Click Edit to add requests or travel companion details.'}
+                          {item.notes || t.noCustomNotesPrompt || 'No custom notes added. Click Edit to add requests or travel companion details.'}
                         </p>
                       )}
                     </div>
@@ -255,14 +263,14 @@ export const SavedTripsScreen: React.FC<SavedTripsScreenProps> = ({
                       <span className="material-symbols-outlined text-[15px] text-[#005f50]">
                         verified
                       </span>
-                      Local concierge verified for {item.travelers} traveler(s)
+                      {t.conciergeVerified} ({item.travelers} {t.travelers})
                     </span>
 
                     <button
                       onClick={() => onSelectTrip(trip)}
                       className="px-4 py-2 rounded-xl bg-[#005f50] text-white text-xs font-semibold hover:bg-[#0d7a68] transition-colors flex items-center gap-1 cursor-pointer"
                     >
-                      <span>View Full Daily Plan</span>
+                      <span>{t.viewDetails}</span>
                       <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
                     </button>
                   </div>
@@ -277,7 +285,7 @@ export const SavedTripsScreen: React.FC<SavedTripsScreenProps> = ({
       {exportToast && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-[#1b1b1e] text-white px-5 py-2.5 rounded-2xl text-xs font-semibold shadow-2xl flex items-center gap-2 z-50 animate-in fade-in slide-in-from-bottom duration-300">
           <span className="material-symbols-outlined text-[18px] text-[#99f3dd]">download_done</span>
-          <span>Curated Travel Portfolio compiled! Shareable link copied to clipboard.</span>
+          <span>{t.toastExportSuccess || 'Curated Travel Portfolio compiled! Shareable link copied to clipboard.'}</span>
         </div>
       )}
     </div>

@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
+import { useLanguage } from '../context/LanguageContext';
 
 export const Footer: React.FC = () => {
+  const { t } = useLanguage();
   const [activeModal, setActiveModal] = useState<'privacy' | 'transparency' | 'telemetry' | null>(null);
 
   return (
@@ -10,7 +12,7 @@ export const Footer: React.FC = () => {
           <div className="flex items-center gap-3">
             <span className="text-lg font-semibold text-[#1b1b1e]">Sarathi</span>
             <span className="text-xs text-[#3e4946]">
-              © 2025 AI Travel Cognition Engine. All rights reserved.
+              © 2026 AI Travel Cognition Engine. All rights reserved.
             </span>
           </div>
 
@@ -19,19 +21,19 @@ export const Footer: React.FC = () => {
               onClick={() => setActiveModal('privacy')}
               className="hover:text-[#1b1b1e] transition-colors cursor-pointer"
             >
-              Privacy Policy
+              {t.privacyPolicy || 'Privacy Policy'}
             </button>
             <button
               onClick={() => setActiveModal('transparency')}
               className="hover:text-[#1b1b1e] transition-colors cursor-pointer"
             >
-              Model Transparency
+              {t.modelTransparency || 'Model Transparency'}
             </button>
             <button
               onClick={() => setActiveModal('telemetry')}
               className="hover:text-[#1b1b1e] transition-colors cursor-pointer"
             >
-              System Telemetry
+              {t.systemTelemetry || 'System Telemetry'}
             </button>
           </div>
         </div>
@@ -50,7 +52,7 @@ export const Footer: React.FC = () => {
 
             {activeModal === 'privacy' && (
               <div>
-                <h3 className="text-lg font-bold text-[#1b1b1e] mb-2">Privacy & Vector Safety</h3>
+                <h3 className="text-lg font-bold text-[#1b1b1e] mb-2">{t.privacyModalTitle || 'Privacy & Vector Safety'}</h3>
                 <p className="text-xs text-[#3e4946] leading-relaxed mb-3">
                   Sarathi utilizes client-side session vectorization. Your personal itinerary drafts, voice transcripts, and accommodation preferences are processed ephemerally. We do not sell query telemetry to third-party commercial OTA brokers.
                 </p>
@@ -62,7 +64,7 @@ export const Footer: React.FC = () => {
 
             {activeModal === 'transparency' && (
               <div>
-                <h3 className="text-lg font-bold text-[#1b1b1e] mb-2">Model Transparency & Intent Graph</h3>
+                <h3 className="text-lg font-bold text-[#1b1b1e] mb-2">{t.transparencyModalTitle || 'Model Transparency & Intent Graph'}</h3>
                 <p className="text-xs text-[#3e4946] leading-relaxed mb-3">
                   Recommendations are synthesized via dual-layer semantic embeddings (128-dimensional dense vector space) weighted with real-time geospatial factors (rainfall, humidity, elevation, crowd density, and transit road roughness).
                 </p>
@@ -77,7 +79,7 @@ export const Footer: React.FC = () => {
                   </div>
                   <div className="flex justify-between py-1">
                     <span className="text-[#6e7a75]">Grounding Benchmark</span>
-                    <span className="font-semibold">Kognivera Hackathon 2026</span>
+                    <span className="font-semibold">Sarathi Core 2026</span>
                   </div>
                 </div>
               </div>
@@ -85,22 +87,22 @@ export const Footer: React.FC = () => {
 
             {activeModal === 'telemetry' && (
               <div>
-                <h3 className="text-lg font-bold text-[#1b1b1e] mb-2">Live System Telemetry</h3>
+                <h3 className="text-lg font-bold text-[#1b1b1e] mb-2">{t.systemTelemetryModalTitle || 'Live System Telemetry'}</h3>
                 <div className="grid grid-cols-2 gap-3 my-3">
                   <div className="p-3 bg-[#fbf8fc] rounded-xl border border-[#E5E7EB]">
-                    <span className="text-[10px] text-[#6e7a75] uppercase">Vector Query Latency</span>
+                    <span className="text-[10px] text-[#6e7a75] uppercase">{t.vectorQueryLatency || 'Vector Query Latency'}</span>
                     <span className="text-lg font-bold text-[#4648d4] block mt-0.5">38ms</span>
                   </div>
                   <div className="p-3 bg-[#fbf8fc] rounded-xl border border-[#E5E7EB]">
-                    <span className="text-[10px] text-[#6e7a75] uppercase">Indexed Micro-zones</span>
+                    <span className="text-[10px] text-[#6e7a75] uppercase">{t.indexedZones || 'Indexed Micro-zones'}</span>
                     <span className="text-lg font-bold text-[#005f50] block mt-0.5">14,280</span>
                   </div>
                   <div className="p-3 bg-[#fbf8fc] rounded-xl border border-[#E5E7EB]">
-                    <span className="text-[10px] text-[#6e7a75] uppercase">Cache Hit Ratio</span>
+                    <span className="text-[10px] text-[#6e7a75] uppercase">{t.cacheHitRatio || 'Cache Hit Ratio'}</span>
                     <span className="text-lg font-bold text-[#1b1b1e] block mt-0.5">99.2%</span>
                   </div>
                   <div className="p-3 bg-[#fbf8fc] rounded-xl border border-[#E5E7EB]">
-                    <span className="text-[10px] text-[#6e7a75] uppercase">Climatic Sensor Streams</span>
+                    <span className="text-[10px] text-[#6e7a75] uppercase">{t.sensorStreams || 'Climatic Sensor Streams'}</span>
                     <span className="text-lg font-bold text-[#1b1b1e] block mt-0.5">418 nodes</span>
                   </div>
                 </div>
@@ -109,9 +111,9 @@ export const Footer: React.FC = () => {
 
             <button
               onClick={() => setActiveModal(null)}
-              className="w-full mt-4 py-2 rounded-xl bg-[#f0edf1] hover:bg-[#eae7eb] text-xs font-semibold text-[#1b1b1e]"
+              className="w-full mt-4 py-2 rounded-xl bg-[#f0edf1] hover:bg-[#eae7eb] text-xs font-semibold text-[#1b1b1e] cursor-pointer"
             >
-              Close
+              {t.close || 'Close'}
             </button>
           </div>
         </div>

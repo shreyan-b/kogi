@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useLanguage } from '../context/LanguageContext';
 
 interface VoiceSearchModalProps {
   isOpen: boolean;
@@ -11,6 +12,7 @@ export const VoiceSearchModal: React.FC<VoiceSearchModalProps> = ({
   onClose,
   onApplyQuery,
 }) => {
+  const { t } = useLanguage();
   const [transcript, setTranscript] = useState('');
   const [isListening, setIsListening] = useState(true);
 
@@ -98,9 +100,9 @@ export const VoiceSearchModal: React.FC<VoiceSearchModalProps> = ({
         <div className="mt-6 flex items-center justify-end gap-2">
           <button
             onClick={onClose}
-            className="px-4 py-2 text-xs font-semibold text-[#6e7a75] hover:text-[#1b1b1e] rounded-xl hover:bg-[#f0edf1]"
+            className="px-4 py-2 text-xs font-semibold text-[#6e7a75] hover:text-[#1b1b1e] rounded-xl hover:bg-[#f0edf1] cursor-pointer"
           >
-            Cancel
+            {t.cancel}
           </button>
           <button
             disabled={!transcript}
@@ -108,9 +110,9 @@ export const VoiceSearchModal: React.FC<VoiceSearchModalProps> = ({
               onApplyQuery(transcript);
               onClose();
             }}
-            className="px-5 py-2.5 rounded-xl bg-[#005f50] text-white font-semibold text-xs flex items-center gap-1.5 hover:bg-[#0d7a68] shadow-md disabled:opacity-50"
+            className="px-5 py-2.5 rounded-xl bg-[#005f50] text-white font-semibold text-xs flex items-center gap-1.5 hover:bg-[#0d7a68] shadow-md disabled:opacity-50 cursor-pointer"
           >
-            <span>Ask Sarathi</span>
+            <span>{t.synthesizeBtn}</span>
             <span className="material-symbols-outlined text-[16px]">explore</span>
           </button>
         </div>
